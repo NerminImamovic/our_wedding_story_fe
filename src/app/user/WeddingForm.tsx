@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { createWeddingDetails, getMyWeddingDetails } from '../../api/apiClient';
-import { uploadCoverImage, uploadImages } from '../actions/uploadImages';
+import { uploadCoverImage } from '../actions/uploadImages';
 
 interface WeddingFormProps {
   onFormSubmit: (slug: string) => void;
