@@ -4,10 +4,10 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 import { revalidatePath } from 'next/cache'
 
 const s3Client = new S3Client({
-  region: process.env.AWS_REGION!,
+  region: process.env.WEDDING_AWS_REGION!,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.WEDDING_AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.WEDDING_AWS_SECRET_ACCESS_KEY!,
   },
 });
 
@@ -19,13 +19,13 @@ export async function uploadCoverImage(formData: FormData) {
 
   try {
     await s3Client.send(new PutObjectCommand({
-      Bucket: process.env.AWS_BUCKET_VJENCANJE_COVER_IMAGES,
+      Bucket: process.env.WEDDING_AWS_BUCKET_VJENCANJE_COVER_IMAGES,
       Key: key,
       Body: buffer,
       ContentType: file.type,
     }))
 
-    const url = `https://${process.env.AWS_BUCKET_VJENCANJE_COVER_IMAGES}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`
+    const url = `https://${process.env.WEDDING_AWS_BUCKET_VJENCANJE_COVER_IMAGES}.s3.${process.env.WEDDING_AWS_REGION}.amazonaws.com/${key}`
     return { success: true, url }
   } catch (error) {
     console.error('Upload error:', error)
@@ -43,13 +43,13 @@ export async function uploadImages({ slug, formData }: { slug: string, formData:
       const key = `${slug}/${Date.now()}-${file.name}`
       
       await s3Client.send(new PutObjectCommand({
-        Bucket: process.env.AWS_BUCKET_NAME_VJENCANJE,
+        Bucket: process.env.WEDDING_AWS_BUCKET_NAME_VJENCANJE,
         Key: key,
         Body: buffer,
         ContentType: file.type,
       }))
 
-      return `https://${process.env.AWS_BUCKET_NAME_VJENCANJE}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`
+      return `https://${process.env.WEDDING_AWS_BUCKET_NAME_VJENCANJE}.s3.${process.env.WEDDING_AWS_REGION}.amazonaws.com/${key}`
     })
 
     const urls = await Promise.all(uploadPromises)
