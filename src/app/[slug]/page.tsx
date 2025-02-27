@@ -12,7 +12,6 @@ import { getWeddingDetails } from '@/api/apiClient'
 import { useQuery } from '@tanstack/react-query'
 import heic2any from 'heic2any'
 
-
 export default function Home() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [previews, setPreviews] = useState<string[]>([])

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // const BASE_URL = 'https://w4dw49ovhe.execute-api.us-east-1.amazonaws.com/dev';
-const BASE_URL = 'https://w4dw49ovhe.execute-api.us-east-1.amazonaws.com/dev'
+const BASE_URL = 'https://g6518yu33i.execute-api.us-east-1.amazonaws.com'
 export const executeApiCall = async (endpoint: string, options: RequestInit = {}): Promise<any> => {
   try {
     const response = await fetch(`${endpoint}`, options);
