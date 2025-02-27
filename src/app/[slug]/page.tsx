@@ -10,10 +10,7 @@ import React from 'react'
 import { useParams } from 'next/navigation';
 import { getWeddingDetails } from '@/api/apiClient'
 import { useQuery } from '@tanstack/react-query'
-import dynamic from 'next/dynamic'
-// import heic2any from 'heic2any'
-
-const Heic2Any = dynamic(() => import('heic2any'), { ssr: false });
+import heic2any from 'heic2any'
 
 
 export default function Home() {
