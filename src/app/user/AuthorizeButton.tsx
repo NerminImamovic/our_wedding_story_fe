@@ -1,3 +1,4 @@
+import { BASE_URL } from '@/api/apiClient';
 import React from 'react';
 
 interface AuthorizeButtonProps {
@@ -8,7 +9,7 @@ interface AuthorizeButtonProps {
 const AuthorizeButton: React.FC<AuthorizeButtonProps> = ({ disabled, email }) => {
   return (
     <a
-      href={`https://w4dw49ovhe.execute-api.us-east-1.amazonaws.com/dev/auth?email=${email}`}
+      href={`${BASE_URL}/auth?email=${email}`}
       className={`mt-4 w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-4 rounded-lg hover:from-purple-700 hover:to-pink-700 ${disabled ? 'disabled:bg-gray-100 cursor-not-allowed' : ''} flex items-center justify-center`}
       onClick={(e) => {
         if (disabled) {
