@@ -1,15 +1,20 @@
+ 
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import Image from 'next/image'
 import { uploadImages } from '../actions/uploadImages'
-import heic2any from 'heic2any'
 import React from 'react'
 import { useParams } from 'next/navigation';
 import { getWeddingDetails } from '@/api/apiClient'
 import { useQuery } from '@tanstack/react-query'
+import dynamic from 'next/dynamic'
+// import heic2any from 'heic2any'
+
+const Heic2Any = dynamic(() => import('heic2any'), { ssr: false });
+
 
 export default function Home() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
@@ -17,13 +22,18 @@ export default function Home() {
   const [uploading, setUploading] = useState<boolean[]>([])
   const [uploadStatus, setUploadStatus] = useState<string>('')
   const [converting, setConverting] = useState<boolean>(false)
+  const [isClient, setIsClient] = useState(false)
 
   const { slug } = useParams() as { slug: string }
 
-    const { data, error, isLoading } = useQuery({
-        queryKey: ['weddingDetails', slug],
-        queryFn: () => getWeddingDetails({ slug: slug as string })
-    })
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  const { data, error, isLoading } = useQuery({
+    queryKey: isClient ? ['weddingDetails', slug] : [],
+    queryFn: () => getWeddingDetails({ slug: slug as string })
+  })
 
   const convertHeicToJpg = async (file: File): Promise<string> => {
     setConverting(true)
@@ -38,16 +48,19 @@ export default function Home() {
     const files = Array.from(e.target.files)
     setSelectedFiles(files)
 
-    const newPreviews = await Promise.all(files.map(async file => {
-      if (file.type === 'image/heic') {
-        return await convertHeicToJpg(file)
-      }
-      return URL.createObjectURL(file)
-    }))
-    setPreviews(prev => {
-      prev.forEach(url => URL.revokeObjectURL(url))
-      return newPreviews
-    })
+
+    if (typeof window !== 'undefined') {
+      const newPreviews = await Promise.all(files.map(async file => {
+        if (file.type === 'image/heic') {
+          return await convertHeicToJpg(file)
+        }
+        return URL.createObjectURL(file)
+      }))
+      setPreviews(prev => {
+        prev.forEach(url => URL.revokeObjectURL(url))
+        return newPreviews
+      })
+    }
 
     setUploading(new Array(files.length).fill(false))
   }, [])
@@ -92,11 +105,13 @@ export default function Home() {
     setTimeout(() => setUploadStatus(''), 3000) // Clear status after 3 seconds
 
     // Reset the file input element to clear the selected files
-    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-    if (fileInput) {
-      fileInput.value = '';
+    if (isClient) {
+      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      if (fileInput) {
+        fileInput.value = '';
+      }
     }
-  }, [selectedFiles])
+  }, [selectedFiles, isClient])
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
