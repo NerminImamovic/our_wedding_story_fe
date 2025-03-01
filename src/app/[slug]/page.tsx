@@ -377,7 +377,7 @@ export default function Home() {
               {!previews.length && !converting && (
                 <div className="h-full min-h-[200px] flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg">
                   <p className="text-gray-400 text-center">
-                    Selected images will appear here
+                    Označene slike/video će se pojaviti ovdje
                   </p>
                 </div>
               )}
