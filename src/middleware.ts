@@ -1,20 +1,21 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+ 
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
 
 const isUserRoute = createRouteMatcher(['/user'])
-const isPublicRoute = createRouteMatcher(['/public-route-example'])
+
+const isDefaultRoute = createRouteMatcher(['/'])
 
 export default clerkMiddleware(async (auth, req: NextRequest) => {
   const { userId, redirectToSignIn } = await auth()
 
   // For users visiting /onboarding, don't try to redirect
-  if (userId && !isUserRoute(req)) {
+  if (userId && isDefaultRoute(req)) {
     return NextResponse.redirect(new URL('/user', req.url))
   }
 
   // If the user is logged in and the route is protected, let them view.
-  if (userId && !isPublicRoute(req)) return NextResponse.next()
+  if (!userId && isUserRoute(req)) return redirectToSignIn();
 })
 
 export const config = {
