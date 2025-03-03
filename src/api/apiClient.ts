@@ -25,12 +25,13 @@ export const getWeddingDetails = async (queryParams: Record<string, string> = {}
   return executeApiCall(`${url}?${queryString}`);
 }
 
-export const createWeddingDetails = async (bodyParams: Record<string, any> = {}): Promise<any> => {
-  const url = BASE_URL + '/wedding-details';
+export const createWeddingDetails = async (bodyParams: Record<string, any> = {}, bearerToken: string): Promise<any> => {
+  const url = `${BASE_URL}/wedding-details`;
   const options: RequestInit = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${bearerToken}`,
     },
     body: JSON.stringify(bodyParams),
   };

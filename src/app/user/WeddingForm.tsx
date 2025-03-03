@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useCallback } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { createWeddingDetails, getMyWeddingDetails } from '../../api/apiClient';
 import { uploadCoverImage } from '../actions/uploadImages';
+import { useAuth } from '@clerk/nextjs';
 
 interface WeddingFormProps {
   onFormSubmit: (slug: string) => void;
@@ -23,6 +25,7 @@ const WeddingForm: React.FC<WeddingFormProps> = ({ onFormSubmit }) => {
   });
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string>('');
+  const { getToken } = useAuth();
 
   const { data: details, error } = useQuery({
     queryKey: ['weddingDetails', { email: 'nimamovic9@gmail.com' }],
@@ -46,7 +49,14 @@ const WeddingForm: React.FC<WeddingFormProps> = ({ onFormSubmit }) => {
   }, [details, error]);
 
   const mutation = useMutation({
-    mutationFn: createWeddingDetails,
+    mutationFn: async (data: Record<string, any>) => {
+      const token = await getToken();
+      if (!token) throw new Error('Authentication token not available');
+
+      console.log("token " + token)
+
+      return createWeddingDetails(data, token);
+    },
     onSuccess: () => {
       console.log('Wedding details created successfully');
     },
