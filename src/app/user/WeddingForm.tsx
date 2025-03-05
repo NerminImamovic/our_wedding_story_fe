@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useCallback } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -22,10 +23,11 @@ const WeddingForm: React.FC<WeddingFormProps> = ({ onFormSubmit }) => {
     slug: '',
     email: 'nimamovic9@gmail.com',
     coverImage: null as File | null,
+    coverImageUrl: '',
   });
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string>('');
-  const { getToken } = useAuth();
+  const { getToken, userId } = useAuth();
 
   const { data: details, error } = useQuery({
     queryKey: ['weddingDetails', { email: 'nimamovic9@gmail.com' }],
@@ -41,6 +43,7 @@ const WeddingForm: React.FC<WeddingFormProps> = ({ onFormSubmit }) => {
         slug: details.slug,
         email: 'nimamovic9@gmail.com',
         coverImage: null,
+        coverImageUrl: details.coverImageUrl,
       });
     }
     if (error) {
@@ -84,40 +87,52 @@ const WeddingForm: React.FC<WeddingFormProps> = ({ onFormSubmit }) => {
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      if (!formData.coverImage) return;
+      if (!formData.coverImage || !formData.coverImageUrl) return;
 
       setUploading(true);
       setUploadStatus('');
 
-      const formDataToUpload = new FormData();
-      formDataToUpload.append('coverImage', formData.coverImage);
-
       try {
-        const result = await uploadCoverImage(formDataToUpload);
+        let coverImageUrl = formData.coverImageUrl;
 
-        if (result.success) {
-          setUploadStatus('Cover image uploaded successfully!');
-          setFormData((prev) => ({ ...prev }));
-          setTimeout(() => setUploadStatus(''), 3000);
-
-          mutation.mutate({
-            bride: formData.bride,
-            groom: formData.groom,
-            weddingDate: formData.weddingDate,
-            slug: formData.slug,
-            coverImageUrl: result.url ? result.url : '',
-            email: formData.email,
-          });
-
-          onFormSubmit(formData.slug);
-        } else {
-          setUploadStatus('Failed to upload cover image. Please try again.');
+        // Only upload a new image if we have a new file
+        if (formData.coverImage) {
+          const formDataToUpload = new FormData();
+          formDataToUpload.append('coverImage', formData.coverImage);
+          
+          const result = await uploadCoverImage(formDataToUpload);
+          
+          if (result.success) {
+            setUploadStatus('Cover image uploaded successfully!');
+            coverImageUrl = result.url || '';
+            
+            // Reset file input
+            const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+            if (fileInput) {
+              fileInput.value = '';
+            }
+          } else {
+            setUploadStatus('Failed to upload cover image. Please try again.');
+            return;
+          }
         }
 
-        const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-        if (fileInput) {
-          fileInput.value = '';
-        }
+        // Update form data with the current coverImageUrl
+        setFormData((prev) => ({ ...prev, coverImageUrl }));
+        setTimeout(() => setUploadStatus(''), 3000);
+
+        // Submit the data with either the new uploaded URL or the existing one
+        mutation.mutate({
+          userId,
+          bride: formData.bride,
+          groom: formData.groom,
+          weddingDate: formData.weddingDate,
+          slug: formData.slug,
+          coverImageUrl,
+          email: formData.email,
+        });
+
+        onFormSubmit(formData.slug);
       } catch (error) {
         console.error('Upload error:', error);
         setUploadStatus('Upload failed. Please try again.');
@@ -125,7 +140,7 @@ const WeddingForm: React.FC<WeddingFormProps> = ({ onFormSubmit }) => {
         setUploading(false);
       }
     },
-    [formData.coverImage, formData.bride, formData.groom, formData.weddingDate, formData.slug, formData.email, mutation, onFormSubmit]
+    [userId, formData.coverImage, formData.bride, formData.groom, formData.weddingDate, formData.slug, formData.coverImageUrl, formData.email, mutation, onFormSubmit]
   );
 
   return (
@@ -176,13 +191,23 @@ const WeddingForm: React.FC<WeddingFormProps> = ({ onFormSubmit }) => {
       <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-white">
         Slika naslovnice
       </label>
+      {(formData.coverImageUrl || formData.coverImage) && (
+        <div className="mb-4">
+          <div className="relative w-full h-200 overflow-hidden rounded-lg">
+            <img 
+              src={formData.coverImage ? URL.createObjectURL(formData.coverImage) : (formData.coverImageUrl || '/placeholder-image.jpg')} 
+              alt="Cover preview" 
+              className="object-cover w-full h-full"
+            />
+          </div>
+        </div>
+      )}
       <input
         type="file"
         name="coverImage"
         accept="image/*"
         onChange={handleInputChange}
         className="block w-full p-3 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-lg focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-pink-500 dark:focus:border-pink-500"
-        required
       />
     </div>
 

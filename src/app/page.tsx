@@ -16,19 +16,19 @@ export default function Home() {
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="w-full group relative">
-            <Image src="https://via.placeholder.com/300x200.png?text=Wedding+Image+1" alt="Slika vjenčanja 1" width={300} height={200} className="rounded-lg transition-transform transform group-hover:scale-105" />
+            <Image src="https://www.selfiewall.net/en/elements/galerie_pictures/selfiewall_wedding-game_icebraker.jpg" alt="Slika vjenčanja 1" width={300} height={200} className="rounded-lg transition-transform transform group-hover:scale-105" />
             <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
               <button className="bg-white text-black py-2 px-4 rounded-lg">Pogledaj detalje</button>
             </div>
           </div>
           <div className="w-full group relative">
-            <Image src="https://via.placeholder.com/300x200.png?text=Wedding+Image+2" alt="Slika vjenčanja 2" width={300} height={200} className="rounded-lg transition-transform transform group-hover:scale-105" />
+            <Image src="https://storage.bljesak.info/image/246074/1280x880/selfie-vjencanje-svatovi.jpg" alt="Slika vjenčanja 2" width={300} height={200} className="rounded-lg transition-transform transform group-hover:scale-105" />
             <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
               <button className="bg-white text-black py-2 px-4 rounded-lg">Pogledaj detalje</button>
             </div>
           </div>
           <div className="w-full group relative">
-            <Image src="https://via.placeholder.com/300x200.png?text=Wedding+Image+3" alt="Slika vjenčanja 3" width={300} height={200} className="rounded-lg transition-transform transform group-hover:scale-105" />
+            <Image src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzOtPj9IipJAFN4WphwAqMfj7dVtctp6MNFg&s" alt="Slika vjenčanja 3" width={300} height={200} className="rounded-lg transition-transform transform group-hover:scale-105" />
             <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
               <button className="bg-white text-black py-2 px-4 rounded-lg">Pogledaj detalje</button>
             </div>
