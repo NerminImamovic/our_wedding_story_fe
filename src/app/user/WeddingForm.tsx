@@ -86,8 +86,13 @@ const WeddingForm: React.FC<WeddingFormProps> = ({ onFormSubmit }) => {
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
+
+      console.log("formData ", formData);
+
       e.preventDefault();
-      if (!formData.coverImage || !formData.coverImageUrl) return;
+      if (!formData.coverImage && !formData.coverImageUrl) return;
+
+      console.log("sljedeca formData " + formData);
 
       setUploading(true);
       setUploadStatus('');
