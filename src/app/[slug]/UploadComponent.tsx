@@ -163,7 +163,7 @@ export default function UploadComponent() {
 
         captureException(error);
 
-        toast.error(`Error uploading ${file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name}`, 
+        toast.error((error as Error).message, 
           { id: `file-${i}` })
         return false
       } finally {
