@@ -1,12 +1,14 @@
+'use client'
+
 import { BASE_URL } from '@/api/apiClient';
 import React from 'react';
+import { useUser } from './UserContext';
 
-interface AuthorizeButtonProps {
-  disabled: boolean;
-  email: string;
-}
+const AuthorizeButton: React.FC = () => {
+  const { slug, email } = useUser();
 
-const AuthorizeButton: React.FC<AuthorizeButtonProps> = ({ disabled, email }) => {
+  const disabled = !slug;
+
   return (
     <a
       href={`${BASE_URL}/auth?email=${email}`}

@@ -29,7 +29,7 @@ export async function uploadCoverImage(formData: FormData) {
     return { success: true, url }
   } catch (error) {
     console.error('Upload error:', error)
-    return { success: false, error: 'Upload failed' }
+    return { success: false, error: (error as Error).message }
   }
 }
 
@@ -57,6 +57,6 @@ export async function uploadImages({ slug, formData }: { slug: string, formData:
     return { success: true, urls }
   } catch (error) {
     console.error('Upload error:', error)
-    return { success: false, error: 'Upload failed' }
+    return { success: false, error: (error as Error).message }
   }
 } 

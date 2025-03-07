@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -16,6 +16,7 @@
     "@tanstack/react-query-devtools": "^5.66.0",
     "@types/qrcode": "^1.5.5",
     "framer-motion": "^12.4.7",
+    "heic-convert": "^2.1.0",
     "heic2any": "^0.0.4",
     "next": "15.1.6",
     "qrcode": "^1.5.4",

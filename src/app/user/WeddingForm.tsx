@@ -1,37 +1,54 @@
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+'use client'
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { createWeddingDetails, getMyWeddingDetails } from '../../api/apiClient';
 import { uploadCoverImage } from '../actions/uploadImages';
-import { useAuth } from '@clerk/nextjs';
-
-interface WeddingFormProps {
-  onFormSubmit: (slug: string) => void;
-}
+import { useAuth, useUser as useClerkUser } from '@clerk/nextjs';
+import { useUser } from './UserContext';
 
 const generateSlug = (bride: string, groom: string, date: string): string => {
   const formattedDate = new Date(date).toISOString().split('T')[0];
   return `${bride}-${groom}-${formattedDate}`;
 };
 
-const WeddingForm: React.FC<WeddingFormProps> = ({ onFormSubmit }) => {
+const WeddingForm: React.FC = () => {
   const [formData, setFormData] = useState({
     bride: '',
     groom: '',
     weddingDate: '',
     slug: '',
-    email: 'nimamovic9@gmail.com',
+    email: '',
     coverImage: null as File | null,
     coverImageUrl: '',
   });
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string>('');
+  const [isClientReady, setIsClientReady] = useState(false);
   const { getToken, userId } = useAuth();
+  const { user, isLoaded, isSignedIn } = useClerkUser();
+  const { setSlug, setEmail } = useUser();
+
+  // Set client-side rendering flag
+  useEffect(() => {
+    setIsClientReady(true);
+  }, []);
+
+  // Set email from Clerk user when available
+  useEffect(() => {
+    if (isLoaded && isSignedIn && user?.emailAddresses?.length > 0) {
+      const primaryEmail = user.emailAddresses[0].emailAddress;
+      setFormData(prev => ({ ...prev, email: primaryEmail }));
+      setEmail(primaryEmail);
+    }
+  }, [isLoaded, isSignedIn, user, setEmail]);
 
   const { data: details, error } = useQuery({
-    queryKey: ['weddingDetails', { email: 'nimamovic9@gmail.com' }],
-    queryFn: () => getMyWeddingDetails({ email: 'nimamovic9@gmail.com' }),
+    queryKey: ['weddingDetails', { email: formData.email }],
+    queryFn: () => getMyWeddingDetails({ email: formData.email }),
+    enabled: !!formData.email && isClientReady, // Only run query when email is available and client is ready
   });
 
   useEffect(() => {
@@ -41,22 +58,23 @@ const WeddingForm: React.FC<WeddingFormProps> = ({ onFormSubmit }) => {
         groom: details.groom,
         weddingDate: details.weddingDate,
         slug: details.slug,
-        email: 'nimamovic9@gmail.com',
+        email: details.email,
         coverImage: null,
         coverImageUrl: details.coverImageUrl,
       });
+
+      setSlug(details.slug);
+      setEmail(details.email);
     }
     if (error) {
       console.error('Error fetching wedding details:', error);
     }
-  }, [details, error]);
+  }, [details, error, setSlug, setEmail]);
 
   const mutation = useMutation({
     mutationFn: async (data: Record<string, any>) => {
       const token = await getToken();
       if (!token) throw new Error('Authentication token not available');
-
-      console.log("token " + token)
 
       return createWeddingDetails(data, token);
     },
@@ -86,13 +104,8 @@ const WeddingForm: React.FC<WeddingFormProps> = ({ onFormSubmit }) => {
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
-
-      console.log("formData ", formData);
-
       e.preventDefault();
       if (!formData.coverImage && !formData.coverImageUrl) return;
-
-      console.log("sljedeca formData " + formData);
 
       setUploading(true);
       setUploadStatus('');
@@ -100,7 +113,6 @@ const WeddingForm: React.FC<WeddingFormProps> = ({ onFormSubmit }) => {
       try {
         let coverImageUrl = formData.coverImageUrl;
 
-        // Only upload a new image if we have a new file
         if (formData.coverImage) {
           const formDataToUpload = new FormData();
           formDataToUpload.append('coverImage', formData.coverImage);
@@ -111,7 +123,6 @@ const WeddingForm: React.FC<WeddingFormProps> = ({ onFormSubmit }) => {
             setUploadStatus('Cover image uploaded successfully!');
             coverImageUrl = result.url || '';
             
-            // Reset file input
             const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
             if (fileInput) {
               fileInput.value = '';
@@ -122,11 +133,9 @@ const WeddingForm: React.FC<WeddingFormProps> = ({ onFormSubmit }) => {
           }
         }
 
-        // Update form data with the current coverImageUrl
         setFormData((prev) => ({ ...prev, coverImageUrl }));
         setTimeout(() => setUploadStatus(''), 3000);
 
-        // Submit the data with either the new uploaded URL or the existing one
         mutation.mutate({
           userId,
           bride: formData.bride,
@@ -137,7 +146,8 @@ const WeddingForm: React.FC<WeddingFormProps> = ({ onFormSubmit }) => {
           email: formData.email,
         });
 
-        onFormSubmit(formData.slug);
+        setSlug(formData.slug);
+        setEmail(formData.email);
       } catch (error) {
         console.error('Upload error:', error);
         setUploadStatus('Upload failed. Please try again.');
@@ -145,8 +155,16 @@ const WeddingForm: React.FC<WeddingFormProps> = ({ onFormSubmit }) => {
         setUploading(false);
       }
     },
-    [userId, formData.coverImage, formData.bride, formData.groom, formData.weddingDate, formData.slug, formData.coverImageUrl, formData.email, mutation, onFormSubmit]
+    [userId, formData.coverImage, formData.bride, formData.groom, formData.weddingDate, formData.slug, formData.coverImageUrl, formData.email, mutation, setSlug, setEmail]
   );
+
+  if (!isClientReady || !isLoaded || !isSignedIn) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8">
+        <div className="w-16 h-16 border-t-4 border-b-4 border-pink-500 rounded-full animate-spin mb-4"></div>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -196,7 +214,7 @@ const WeddingForm: React.FC<WeddingFormProps> = ({ onFormSubmit }) => {
       <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-white">
         Slika naslovnice
       </label>
-      {(formData.coverImageUrl || formData.coverImage) && (
+      {isClientReady && (formData.coverImageUrl || formData.coverImage) && (
         <div className="mb-4">
           <div className="relative w-full h-200 overflow-hidden rounded-lg">
             <img 
@@ -213,6 +231,22 @@ const WeddingForm: React.FC<WeddingFormProps> = ({ onFormSubmit }) => {
         accept="image/*"
         onChange={handleInputChange}
         className="block w-full p-3 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-lg focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-pink-500 dark:focus:border-pink-500"
+      />
+    </div>
+
+    <div>
+      <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-white">
+        Email
+      </label>
+      <input
+        type="email"
+        name="email"
+        value={formData.email || ''}
+        onChange={handleInputChange}
+        className="block w-full p-3 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-lg focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-pink-500 dark:focus:border-pink-500"
+        required
+        readOnly
+        disabled
       />
     </div>
 
