@@ -10,6 +10,7 @@ import { useQuery } from '@tanstack/react-query'
 import heic2any from 'heic2any'
 import { toast, Toaster } from 'react-hot-toast'
 import { motion, AnimatePresence } from 'framer-motion'
+import { captureException } from '@sentry/nextjs';
 
 export default function UploadComponent() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
@@ -159,6 +160,9 @@ export default function UploadComponent() {
         }
       } catch (error) {
         console.error('Upload error:', error)
+
+        captureException(error);
+
         toast.error(`Error uploading ${file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name}`, 
           { id: `file-${i}` })
         return false
