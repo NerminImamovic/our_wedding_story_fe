@@ -163,8 +163,8 @@ export default function UploadComponent() {
 
         captureException(error);
 
-        toast.error((error as Error).message, 
-          { id: `file-${i}` })
+        toast.error((error as Error).message)
+
         return false
       } finally {
         setUploading(prev => {
