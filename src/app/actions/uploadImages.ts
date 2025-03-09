@@ -41,6 +41,10 @@ export async function uploadImages({ slug, formData }: { slug: string, formData:
       const buffer = Buffer.from(bytes)
       
       const key = `${slug}/${Date.now()}-${file.name}`
+
+      console.log('Uploading image to S3:', key)
+      console.log('Buffer:', buffer)
+      console.log('File type:', file.type)
       
       await s3Client.send(new PutObjectCommand({
         Bucket: process.env.WEDDING_AWS_BUCKET_NAME_VJENCANJE,

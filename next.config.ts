@@ -4,9 +4,16 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   experimental: {
+    // serverMinification: false,
     serverActions: {
-      bodySizeLimit: '50mb',
+      bodySizeLimit: '100mb', // Increased from 50mb to 100mb to handle larger payloads
     },
+  },
+  api: {
+    bodyParser: {
+      sizeLimit: '100mb', // Added API body parser size limit
+    },
+    responseLimit: '100mb', // Added response size limit
   },
   images: {
     remotePatterns: [

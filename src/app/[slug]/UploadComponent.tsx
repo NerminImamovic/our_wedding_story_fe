@@ -82,6 +82,7 @@ export default function UploadComponent() {
     if (!e.target.files || e.target.files.length === 0) return
     const files = Array.from(e.target.files)
     await processFiles(files)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleDragEnter = useCallback((e: React.DragEvent) => {
@@ -110,6 +111,7 @@ export default function UploadComponent() {
       const files = Array.from(e.dataTransfer.files)
       await processFiles(files)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const removeFile = useCallback((index: number) => {
