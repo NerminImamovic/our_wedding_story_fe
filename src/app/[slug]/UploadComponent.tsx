@@ -2,10 +2,10 @@
 
 import { useState, useCallback, useEffect } from 'react'
 import Image from 'next/image'
-import { uploadImages } from '../actions/uploadImages'
+// import { uploadImages } from '../actions/uploadImages'
 import React from 'react'
 import { useParams } from 'next/navigation'
-import { getWeddingDetails } from '@/api/apiClient'
+import { getPresignedUploadUrl, getWeddingDetails, uploadFile  } from '@/api/apiClient'
 import { useQuery } from '@tanstack/react-query'
 import heic2any from 'heic2any'
 import { toast, Toaster } from 'react-hot-toast'
@@ -144,22 +144,59 @@ export default function UploadComponent() {
         toast.loading(`Uploading ${file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name}`, 
           { id: `file-${i}` })
         
-        const result = await uploadImages({ slug, formData })
+        const presignedUrlResponse = await getPresignedUploadUrl({ fileName: file.name, prefix: slug, contentType: file.type, bearerToken: data?.token })
         
-        if (result.success) {
+        console.log(JSON.stringify(presignedUrlResponse, null, 2))
+
+        debugger;
+
+        // Upload file to S3 using the presigned URL
+        const uploadResponse = await fetch(presignedUrlResponse.presignedUrl, {
+          method: 'PUT',
+          body: file, // File is binary data that will be sent directly to S3
+          headers: {
+            'Content-Type': file.type,
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'PUT, GET, POST, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+          },
+          mode: 'cors',
+          credentials: 'same-origin'
+        });
+
+        debugger;
+
+        if (uploadResponse.ok) {
           setUploadProgress(prev => {
-            const newProgress = [...prev]
-            newProgress[i] = 100
-            return newProgress
-          })
+            const newProgress = [...prev];
+            newProgress[i] = 100;
+            return newProgress;
+          });
           toast.success(`Uploaded ${file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name}`, 
-            { id: `file-${i}` })
-          return true
+            { id: `file-${i}` });
+          return true;
         } else {
           toast.error(`Failed to upload ${file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name}`, 
-            { id: `file-${i}` })
-          return false
+            { id: `file-${i}` });
+          return false;
         }
+
+
+        
+        // if (result.success) {
+        //   setUploadProgress(prev => {
+        //     const newProgress = [...prev]
+        //     newProgress[i] = 100
+        //     return newProgress
+        //   })
+        //   toast.success(`Uploaded ${file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name}`, 
+        //     { id: `file-${i}` })
+        //   return true
+        // } else {
+        //   toast.error(`Failed to upload ${file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name}`, 
+        //     { id: `file-${i}` })
+        //   return false
+        // }
       } catch (error) {
         console.error('Upload error:', error)
 
@@ -432,7 +469,7 @@ export default function UploadComponent() {
                         transition={{ delay: index * 0.05 }}
                         className="relative aspect-square group overflow-hidden rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
                       >
-                        {preview.match(/.(mp4|webm|ogg)$/i) ? (
+                        {preview.match(/\.(mp4|webm|ogg|mov|MOV)$/i) || selectedFiles[index]?.type.startsWith('video/') ? (
                           <video
                             src={preview}
                             controls
@@ -449,7 +486,6 @@ export default function UploadComponent() {
                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                           </div>
                         )}
-                        
                         {uploading[index] && (
                           <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-60 rounded-xl">
                             <div className="w-12 h-12 border-4 border-green-400 border-t-4 border-t-transparent rounded-full animate-spin mb-2 shadow-[0_0_10px_rgba(74,222,128,0.6)]"></div>

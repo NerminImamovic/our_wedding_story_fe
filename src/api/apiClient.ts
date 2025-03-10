@@ -44,3 +44,63 @@ export const getMyWeddingDetails = async (queryParams: Record<string, string> = 
   const queryString = new URLSearchParams(queryParams).toString();
   return executeApiCall(`${url}?${queryString}`);
 }
+
+export const uploadFile = async ({
+  file,
+  prefix,
+  bearerToken,
+}: {
+  file: File,
+  prefix: string,
+  bearerToken: string
+}): Promise<any> => {
+  const url = `${BASE_URL}/upload`;
+  
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('prefix', prefix);
+  
+  const options: RequestInit = {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${bearerToken}`,
+    },
+    body: formData,
+  };
+  
+  return executeApiCall(url, options);
+}
+
+export const getPresignedUploadUrl = async ({
+  fileName,
+  prefix,
+  contentType,
+  bearerToken,
+}: {
+  fileName: string,
+  prefix: string,
+  contentType: string,
+  bearerToken: string
+}): Promise<{
+  presignedUrl: string,
+  key: string,
+  bucket: string,
+  expiresIn: number
+}> => {
+  const url = `${BASE_URL}/upload-presigned-url`;
+  
+  const options: RequestInit = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${bearerToken}`,
+    },
+    body: JSON.stringify({
+      fileName,
+      prefix,
+      contentType
+    }),
+  };
+  
+  return executeApiCall(url, options);
+}
