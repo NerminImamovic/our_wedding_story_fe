@@ -5,7 +5,7 @@ import Image from 'next/image'
 // import { uploadImages } from '../actions/uploadImages'
 import React from 'react'
 import { useParams } from 'next/navigation'
-import { getPresignedUploadUrl, getWeddingDetails, uploadFile  } from '@/api/apiClient'
+import { getPresignedUploadUrl, getWeddingDetails  } from '@/api/apiClient'
 import { useQuery } from '@tanstack/react-query'
 import heic2any from 'heic2any'
 import { toast, Toaster } from 'react-hot-toast'
@@ -242,7 +242,7 @@ export default function UploadComponent() {
         }
       }
     }, 3000)
-  }, [selectedFiles, isClient, slug])
+  }, [selectedFiles, isClient, slug, data?.token])
 
   const isUploading = uploading.some(status => status)
 

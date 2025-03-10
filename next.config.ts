@@ -9,12 +9,6 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '100mb', // Increased from 50mb to 100mb to handle larger payloads
     },
   },
-  api: {
-    bodyParser: {
-      sizeLimit: '100mb', // Added API body parser size limit
-    },
-    responseLimit: '100mb', // Added response size limit
-  },
   images: {
     remotePatterns: [
       {
