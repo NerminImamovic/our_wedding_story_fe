@@ -124,18 +124,6 @@ export default function Home() {
                 Kontaktirajte nas
               </Link>
             </div>
-
-            <div className="border-t border-gray-200 pt-6">
-              <Link href="/user">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="inline-block bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold py-3 px-8 rounded-full hover:from-indigo-700 hover:to-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                  >
-                  Sign In
-                </motion.button>
-              </Link>
-            </div>
           </motion.div>
         </div>
       </motion.div>
