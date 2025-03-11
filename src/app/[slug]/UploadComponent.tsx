@@ -2,15 +2,16 @@
 
 import { useState, useCallback, useEffect } from 'react'
 import Image from 'next/image'
-// import { uploadImages } from '../actions/uploadImages'
+import { getPresignedUploadUrl } from '../actions/uploadImages'
 import React from 'react'
 import { useParams } from 'next/navigation'
-import { getPresignedUploadUrl, getWeddingDetails  } from '@/api/apiClient'
+import { getWeddingDetails  } from '@/api/apiClient'
 import { useQuery } from '@tanstack/react-query'
 import heic2any from 'heic2any'
 import { toast, Toaster } from 'react-hot-toast'
 import { motion, AnimatePresence } from 'framer-motion'
 import { captureException } from '@sentry/nextjs';
+import { uploadFileToS3 } from '@/api/s3PresingedClient'
 
 export default function UploadComponent() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
@@ -144,27 +145,18 @@ export default function UploadComponent() {
         toast.loading(`Uploading ${file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name}`, 
           { id: `file-${i}` })
         
-        const presignedUrlResponse = await getPresignedUploadUrl({ fileName: file.name, prefix: slug, contentType: file.type, bearerToken: data?.token })
+        const presignedUrlResponse = await getPresignedUploadUrl({ fileName: file.name, prefix: slug, contentType: file.type })
         
         console.log(JSON.stringify(presignedUrlResponse, null, 2))
 
-        debugger;
+
+        if (!presignedUrlResponse.presignedUrl) {
+          toast.error('Failed to get presigned URL')
+          return false
+        }
 
         // Upload file to S3 using the presigned URL
-        const uploadResponse = await fetch(presignedUrlResponse.presignedUrl, {
-          method: 'PUT',
-          body: file, // File is binary data that will be sent directly to S3
-          headers: {
-            'Content-Type': file.type,
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'PUT, GET, POST, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
-          },
-          mode: 'cors',
-          credentials: 'same-origin'
-        });
-
-        debugger;
+        const uploadResponse = await uploadFileToS3({ file, presignedUrl: presignedUrlResponse.presignedUrl });
 
         if (uploadResponse.ok) {
           setUploadProgress(prev => {
@@ -181,22 +173,6 @@ export default function UploadComponent() {
           return false;
         }
 
-
-        
-        // if (result.success) {
-        //   setUploadProgress(prev => {
-        //     const newProgress = [...prev]
-        //     newProgress[i] = 100
-        //     return newProgress
-        //   })
-        //   toast.success(`Uploaded ${file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name}`, 
-        //     { id: `file-${i}` })
-        //   return true
-        // } else {
-        //   toast.error(`Failed to upload ${file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name}`, 
-        //     { id: `file-${i}` })
-        //   return false
-        // }
       } catch (error) {
         console.error('Upload error:', error)
 

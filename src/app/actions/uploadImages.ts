@@ -1,6 +1,7 @@
 'use server'
 
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { revalidatePath } from 'next/cache'
 
 const s3Client = new S3Client({
@@ -64,3 +65,38 @@ export async function uploadImages({ slug, formData }: { slug: string, formData:
     return { success: false, error: (error as Error).message }
   }
 } 
+
+export async function getPresignedUploadUrl({ 
+  fileName, 
+  prefix, 
+  contentType 
+}: { 
+  fileName: string, 
+  prefix: string, 
+  contentType: string 
+}) {
+  try {
+    const key = `${prefix}/${Date.now()}-${fileName}`;
+    
+    const command = new PutObjectCommand({
+      Bucket: process.env.WEDDING_AWS_BUCKET_NAME_VJENCANJE,
+      Key: key,
+      ContentType: contentType,
+    });
+    
+    const presignedUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+    
+    return { 
+      success: true, 
+      presignedUrl,
+      key,
+      url: `https://${process.env.WEDDING_AWS_BUCKET_NAME_VJENCANJE}.s3.${process.env.WEDDING_AWS_REGION}.amazonaws.com/${key}`
+    };
+  } catch (error) {
+    console.error('Error generating presigned URL:', error);
+    return { 
+      success: false, 
+      error: (error as Error).message 
+    };
+  }
+}
