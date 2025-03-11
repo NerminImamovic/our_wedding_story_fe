@@ -29,7 +29,7 @@ const WeddingForm: React.FC = () => {
   const [isClientReady, setIsClientReady] = useState(false);
   const { getToken, userId } = useAuth();
   const { user, isLoaded, isSignedIn } = useClerkUser();
-  const { setSlug, setEmail } = useUser();
+  const { setSlug, setEmail, email } = useUser();
 
   // Set client-side rendering flag
   useEffect(() => {
@@ -39,7 +39,10 @@ const WeddingForm: React.FC = () => {
   // Set email from Clerk user when available
   useEffect(() => {
     if (isLoaded && isSignedIn && user?.emailAddresses?.length > 0) {
-      const primaryEmail = user.emailAddresses[0].emailAddress;
+
+      console.log('primaryEmailAddress', user.primaryEmailAddress);
+
+      const primaryEmail = user.primaryEmailAddress?.emailAddress || user.emailAddresses[0].emailAddress;
       setFormData(prev => ({ ...prev, email: primaryEmail }));
       setEmail(primaryEmail);
     }
@@ -58,7 +61,7 @@ const WeddingForm: React.FC = () => {
         groom: details.groom,
         weddingDate: details.weddingDate,
         slug: details.slug,
-        email: details.email,
+        email: email,
         coverImage: null,
         coverImageUrl: details.coverImageUrl,
       });
