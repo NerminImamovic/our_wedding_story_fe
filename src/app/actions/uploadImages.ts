@@ -34,14 +34,14 @@ export async function uploadCoverImage(formData: FormData) {
   }
 }
 
-export async function uploadImages({ slug, formData }: { slug: string, formData: FormData }) {
+export async function uploadImages({ slug, formData, userId }: { slug: string, formData: FormData, userId?: string }) {
   try {
     const files = formData.getAll('files') as File[]
     const uploadPromises = files.map(async (file) => {
       const bytes = await file.arrayBuffer()
       const buffer = Buffer.from(bytes)
       
-      const key = `${slug}/${Date.now()}-${file.name}`
+      const key = `${slug}/${userId}/${Date.now()}-${file.name}`
 
       console.log('Uploading image to S3:', key)
       console.log('Buffer:', buffer)
@@ -69,14 +69,18 @@ export async function uploadImages({ slug, formData }: { slug: string, formData:
 export async function getPresignedUploadUrl({ 
   fileName, 
   prefix, 
-  contentType 
+  contentType, 
+  userId,
 }: { 
   fileName: string, 
   prefix: string, 
-  contentType: string 
+  contentType: string,
+  userId: string,
 }) {
   try {
-    const key = `${prefix}/${Date.now()}-${fileName}`;
+    const key = `${prefix}/${userId}/${Date.now()}-${fileName}`;
+
+    // `1746492691952-c7ccbbcb92ec86b87806ec9a6d124d1d-OWS_USER_ID_36707557-6568-40c8-a208-42302ec28b8e/1746492676048-DSC_6346.jpg`
     
     const command = new PutObjectCommand({
       Bucket: process.env.WEDDING_AWS_BUCKET_NAME_VJENCANJE,

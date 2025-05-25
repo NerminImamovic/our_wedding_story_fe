@@ -13,7 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { captureException } from '@sentry/nextjs';
 import { uploadFileToS3 } from '@/api/s3PresingedClient'
 
-export default function UploadComponent() {
+export default function UploadComponent({ slug, userId }: { slug: string, userId: string }) {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [previews, setPreviews] = useState<string[]>([])
   const [uploading, setUploading] = useState<boolean[]>([])
@@ -22,8 +22,6 @@ export default function UploadComponent() {
   const [isClient, setIsClient] = useState(false)
   const [dragActive, setDragActive] = useState(false)
   const [uploadComplete, setUploadComplete] = useState(false)
-
-  const { slug } = useParams() as { slug: string }
 
   useEffect(() => {
     setIsClient(true)
@@ -145,7 +143,7 @@ export default function UploadComponent() {
         toast.loading(`Uploading ${file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name}`, 
           { id: `file-${i}` })
         
-        const presignedUrlResponse = await getPresignedUploadUrl({ fileName: file.name, prefix: slug, contentType: file.type })
+        const presignedUrlResponse = await getPresignedUploadUrl({ fileName: file.name, prefix: slug, contentType: file.type, userId: userId })
         
         console.log(JSON.stringify(presignedUrlResponse, null, 2))
 
@@ -457,7 +455,7 @@ export default function UploadComponent() {
                       transition-all duration-300 shadow-sm font-medium tracking-wide
                       ${uploadComplete 
                         ? 'bg-gradient-to-r from-gold-200 to-gold-100 text-gold-800 border border-gold-200' 
-                        : 'bg-gradient-to-r from-gold-400 to-gold-300 text-white border border-gold-300 hover:from-gold-500 hover:to-gold-400'
+                        : 'bg-gradient-to-r from-gold-400 to-gold-300 border border-gold-300 hover:from-gold-500 hover:to-gold-400'
                       }
                       disabled:opacity-70 disabled:cursor-not-allowed`}
                   >
@@ -565,7 +563,7 @@ export default function UploadComponent() {
                           </motion.button>
                         )}
                         
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent text-white text-xs p-3 truncate transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-10">
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent text-xs p-3 truncate transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-10">
                           {selectedFiles[index]?.name || `File ${index + 1}`}
                         </div>
                       </motion.div>
