@@ -45,6 +45,25 @@ export const getMyWeddingDetails = async (queryParams: Record<string, string> = 
   return executeApiCall(`${url}?${queryString}`);
 }
 
+export const getUserImages = async ({ slug, userId }: { slug: string, userId: string }): Promise<any> => {
+  const url = `${BASE_URL}/my-images`;
+  const queryString = new URLSearchParams({ slug, userId }).toString();
+  return executeApiCall(`${url}?${queryString}`);
+}
+
+export const deleteUserImage = async ({ imageKey, bearerToken }: { imageKey: string, bearerToken: string }): Promise<any> => {
+  const url = `${BASE_URL}/delete-image`;
+  const options: RequestInit = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${bearerToken}`,
+    },
+    body: JSON.stringify({ key: imageKey }),
+  };
+  return executeApiCall(url, options);
+}
+
 export const uploadFile = async ({
   file,
   prefix,

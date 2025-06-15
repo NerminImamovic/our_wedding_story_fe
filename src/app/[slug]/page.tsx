@@ -13,5 +13,11 @@ export default function Home() {
     setUserId(getOrCreateUserId())
   }, [])
 
-  return <UploadComponent slug={slug} userId={userId} />
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="mb-12">
+        <UploadComponent slug={slug} userId={userId} />
+      </div>
+    </div>
+  )
 }

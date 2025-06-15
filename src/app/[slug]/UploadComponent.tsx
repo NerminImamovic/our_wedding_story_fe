@@ -7,11 +7,11 @@ import React from 'react'
 import { useParams } from 'next/navigation'
 import { getWeddingDetails  } from '@/api/apiClient'
 import { useQuery } from '@tanstack/react-query'
-import heic2any from 'heic2any'
 import { toast, Toaster } from 'react-hot-toast'
 import { motion, AnimatePresence } from 'framer-motion'
 import { captureException } from '@sentry/nextjs';
 import { uploadFileToS3 } from '@/api/s3PresingedClient'
+import ImageGalleryComponent from './ImageGalleryComponent'
 
 export default function UploadComponent({ slug, userId }: { slug: string, userId: string }) {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
@@ -35,8 +35,17 @@ export default function UploadComponent({ slug, userId }: { slug: string, userId
   const convertHeicToJpg = async (file: File): Promise<string> => {
     setConverting(true)
     try {
-      const convertedBlob = await heic2any({ blob: file, toType: 'image/jpeg' })
-      return URL.createObjectURL(convertedBlob as Blob)
+
+      if (typeof window !== 'undefined') {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const heic2any = require('heic2any');
+
+        const convertedBlob = await heic2any({ blob: file, toType: 'image/jpeg' })
+
+        return URL.createObjectURL(convertedBlob as Blob)
+      }
+
+      return '';
     } catch (error) {
       console.error('HEIC conversion error:', error)
       toast.error('Failed to convert HEIC image')
@@ -611,6 +620,8 @@ export default function UploadComponent({ slug, userId }: { slug: string, userId
             </div>
           </div>
         </div>
+
+        <ImageGalleryComponent slug={slug} userId={userId} />
 
         <motion.div 
           initial={{ opacity: 0 }}
