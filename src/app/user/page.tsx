@@ -6,7 +6,6 @@ import QRCodeGenerator from './QRCodeGenerator'
 import AuthorizeButton from './AuthorizeButton'
 import { UserProvider } from './UserContext'
 import { UserButton } from '@clerk/nextjs'
-import ThemeSwitcher from '@/components/theme-switcher'
 
 export default function UserPage() {
   return (
@@ -15,8 +14,6 @@ export default function UserPage() {
         <div className="absolute top-4 right-4">
           <UserButton />
         </div>
-        
-        <ThemeSwitcher />
         
         <div className="max-w-lg w-full bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8">
           <h2 className="text-4xl font-extrabold text-gray-900 dark:text-gray-100 mb-6 text-center">Podaci o vjenčanju</h2>
