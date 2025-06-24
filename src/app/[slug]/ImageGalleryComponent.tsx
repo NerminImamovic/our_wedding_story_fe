@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import Image from 'next/image'
 import { deleteUserImage, getUserImages } from '@/api/apiClient'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'

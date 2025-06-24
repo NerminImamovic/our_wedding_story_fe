@@ -4,7 +4,6 @@ import { useState, useCallback, useEffect } from 'react'
 import Image from 'next/image'
 import { getPresignedUploadUrl } from '../actions/uploadImages'
 import React from 'react'
-import { useParams } from 'next/navigation'
 import { getWeddingDetails  } from '@/api/apiClient'
 import { useQuery } from '@tanstack/react-query'
 import { toast, Toaster } from 'react-hot-toast'
@@ -225,6 +224,7 @@ export default function UploadComponent({ slug, userId }: { slug: string, userId
         }
       }
     }, 3000)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFiles, isClient, slug, data?.token])
 
   const isUploading = uploading.some(status => status)

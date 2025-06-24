@@ -72,6 +72,7 @@ const WeddingForm: React.FC = () => {
     if (error) {
       console.error('Error fetching wedding details:', error);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [details, error, setSlug, setEmail]);
 
   const mutation = useMutation({
