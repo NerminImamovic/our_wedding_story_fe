@@ -42,7 +42,7 @@ export default function Home() {
             transition={{ delay: 0.5, duration: 0.5 }}
             className="text-lg md:text-xl text-gray-700 mb-8 leading-relaxed"
           >
-            Oduševljeni smo što možete proslaviti vašu sretnu noć s nama! Istražite i preuzmite slike koje su zabilježili vaši gosti po simboličnoj cijeni od <span className="font-bold text-pink-600">99KM</span>.
+            Oduševljeni smo što možete proslaviti vašu sretnu noć s nama! Istražite i preuzmite slike koje su zabilježili vaši gosti po simboličnoj cijeni od <span className="font-bold text-pink-600">150KM</span>.
           </motion.p>
           
           <motion.div 

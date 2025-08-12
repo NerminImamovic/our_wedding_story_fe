@@ -9,7 +9,9 @@ import { useQuery } from '@tanstack/react-query'
 import { toast, Toaster } from 'react-hot-toast'
 import { motion, AnimatePresence } from 'framer-motion'
 import { captureException } from '@sentry/nextjs';
-import { uploadFileToS3 } from '@/api/s3PresingedClient'
+import { uploadFileToS3WithRetry } from '@/api/s3PresingedClient'
+import { UploadQueue } from '@/utils/uploadQueue'
+import { validateFileSize, formatFileSize } from '@/utils/fileUtils'
 import ImageGalleryComponent from './ImageGalleryComponent'
 
 export default function UploadComponent({ slug, userId }: { slug: string, userId: string }) {
@@ -21,6 +23,8 @@ export default function UploadComponent({ slug, userId }: { slug: string, userId
   const [isClient, setIsClient] = useState(false)
   const [dragActive, setDragActive] = useState(false)
   const [uploadComplete, setUploadComplete] = useState(false)
+  const [uploadQueue] = useState(() => new UploadQueue(3)) // Max 3 concurrent uploads
+  const [fileErrors, setFileErrors] = useState<string[]>([])
 
   useEffect(() => {
     setIsClient(true)
@@ -55,14 +59,32 @@ export default function UploadComponent({ slug, userId }: { slug: string, userId
   }
 
   const processFiles = async (files: File[]) => {
-    setSelectedFiles(files)
-    setUploadProgress(new Array(files.length).fill(0))
+    // Validate file sizes and types
+    const validFiles: File[] = []
+    const errors: string[] = []
+    
+    files.forEach((file) => {
+      if (!validateFileSize(file, 100)) { // 100MB max
+        errors.push(`${file.name} is too large (${formatFileSize(file.size)}). Max size is 100MB.`)
+      } else {
+        validFiles.push(file)
+      }
+    })
+    
+    if (errors.length > 0) {
+      errors.forEach(error => toast.error(error))
+      if (validFiles.length === 0) return
+    }
+    
+    setSelectedFiles(validFiles)
+    setFileErrors(errors)
+    setUploadProgress(new Array(validFiles.length).fill(0))
     setUploadComplete(false)
 
     if (typeof window !== 'undefined') {
       try {
         toast.loading('Preparing your files...', { id: 'preparing' })
-        const newPreviews = await Promise.all(files.map(async file => {
+        const newPreviews = await Promise.all(validFiles.map(async file => {
           if (file.name.toLowerCase().endsWith('.heic')) {
             return await convertHeicToJpg(file)
           }
@@ -74,7 +96,7 @@ export default function UploadComponent({ slug, userId }: { slug: string, userId
           return newPreviews
         })
         toast.dismiss('preparing')
-        toast.success(`${files.length} files ready to upload`)
+        toast.success(`${validFiles.length} files ready to upload`)
       } catch (error) {
         console.error('Preview generation error:', error)
         toast.error('Failed to generate previews for some files')
@@ -82,7 +104,7 @@ export default function UploadComponent({ slug, userId }: { slug: string, userId
       }
     }
 
-    setUploading(new Array(files.length).fill(false))
+    setUploading(new Array(validFiles.length).fill(false))
   }
 
   const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -137,34 +159,49 @@ export default function UploadComponent({ slug, userId }: { slug: string, userId
     
     const uploadToastId = toast.loading('Starting upload...')
     
-    const uploadPromises = selectedFiles.map(async (file, i) => {
+    // Sort files by size to prioritize smaller files first
+    const sortedFiles = [...selectedFiles].sort((a, b) => a.size - b.size)
+    
+    const uploadPromises = sortedFiles.map(async (file, i) => {
       setUploading(prev => {
         const newUploading = [...prev]
         newUploading[i] = true
         return newUploading
       })
 
-      const formData = new FormData()
-      formData.append('files', file)
-
       try {
-        toast.loading(`Uploading ${file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name}`, 
+        toast.loading(`Queuing ${file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name}`, 
           { id: `file-${i}` })
         
-        const presignedUrlResponse = await getPresignedUploadUrl({ fileName: file.name, prefix: slug, contentType: file.type, userId: userId })
-        
-        console.log(JSON.stringify(presignedUrlResponse, null, 2))
-
+        const presignedUrlResponse = await getPresignedUploadUrl({ 
+          fileName: file.name, 
+          prefix: slug, 
+          contentType: file.type, 
+          userId: userId 
+        })
 
         if (!presignedUrlResponse.presignedUrl) {
           toast.error('Failed to get presigned URL')
           return false
         }
 
-        // Upload file to S3 using the presigned URL
-        const uploadResponse = await uploadFileToS3({ file, presignedUrl: presignedUrlResponse.presignedUrl });
+        // Use upload queue for better control and progress tracking
+        const uploadResult = await uploadQueue.add(async () => {
+          const uploadResponse = await uploadFileToS3WithRetry({ 
+            file, 
+            presignedUrl: presignedUrlResponse.presignedUrl,
+            onProgress: (progress) => {
+              setUploadProgress(prev => {
+                const newProgress = [...prev];
+                newProgress[i] = progress;
+                return newProgress;
+              });
+            }
+          });
+          return uploadResponse;
+        });
 
-        if (uploadResponse.ok) {
+        if (uploadResult.ok) {
           setUploadProgress(prev => {
             const newProgress = [...prev];
             newProgress[i] = 100;
@@ -181,11 +218,8 @@ export default function UploadComponent({ slug, userId }: { slug: string, userId
 
       } catch (error) {
         console.error('Upload error:', error)
-
         captureException(error);
-
         toast.error((error as Error).message)
-
         return false
       } finally {
         setUploading(prev => {
@@ -215,6 +249,7 @@ export default function UploadComponent({ slug, userId }: { slug: string, userId
       setPreviews([])
       setUploadProgress([])
       setUploadComplete(false)
+      setFileErrors([])
       
       // Reset the file input element
       if (isClient) {
@@ -225,7 +260,7 @@ export default function UploadComponent({ slug, userId }: { slug: string, userId
       }
     }, 3000)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedFiles, isClient, slug, data?.token])
+  }, [selectedFiles, isClient, slug, data?.token, uploadQueue])
 
   const isUploading = uploading.some(status => status)
 
@@ -410,6 +445,7 @@ export default function UploadComponent({ slug, userId }: { slug: string, userId
                   Browse Files
                 </button>
                 <p className="text-xs text-gray-400 mt-4">Supports: JPG, PNG, GIF, MP4, HEIC</p>
+                <p className="text-xs text-gray-400">Max file size: 100MB</p>
               </div>
               <input
                 type="file"
@@ -440,6 +476,7 @@ export default function UploadComponent({ slug, userId }: { slug: string, userId
                           setPreviews([])
                           setUploading([])
                           setUploadProgress([])
+                          setFileErrors([])
                           
                           // Reset the file input element
                           if (isClient) {
@@ -455,6 +492,27 @@ export default function UploadComponent({ slug, userId }: { slug: string, userId
                       </button>
                     )}
                   </div>
+                  
+                  {/* File size info */}
+                  <div className="mb-3 text-xs text-gray-500">
+                    Total size: {formatFileSize(selectedFiles.reduce((total, file) => total + file.size, 0))}
+                  </div>
+                  
+                  {/* Upload queue status */}
+                  <div className="mb-3 text-xs text-gray-500">
+                    Queue: {uploadQueue.getQueueLength()} files waiting, {uploadQueue.getRunningCount()} uploading
+                  </div>
+                  
+                  {/* File errors display */}
+                  {fileErrors.length > 0 && (
+                    <div className="mb-3 p-2 bg-rose-50 border border-rose-200 rounded text-xs text-rose-700">
+                      <div className="font-medium mb-1">Issues found:</div>
+                      {fileErrors.map((error, idx) => (
+                        <div key={idx} className="text-rose-600">• {error}</div>
+                      ))}
+                    </div>
+                  )}
+                  
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -536,6 +594,14 @@ export default function UploadComponent({ slug, userId }: { slug: string, userId
                           <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm rounded-xl z-20">
                             <div className="w-10 h-10 border-3 border-gold-300 border-t-3 border-t-transparent rounded-full animate-spin mb-2"></div>
                             <p className="text-sm text-gray-600 animate-pulse">Uploading...</p>
+                            {uploadProgress[index] > 0 && uploadProgress[index] < 100 && (
+                              <div className="w-16 h-1 bg-gray-200 rounded-full overflow-hidden mt-2">
+                                <div 
+                                  className="h-full bg-gold-400 transition-all duration-300"
+                                  style={{ width: `${uploadProgress[index]}%` }}
+                                />
+                              </div>
+                            )}
                           </div>
                         )}
                         
@@ -573,7 +639,8 @@ export default function UploadComponent({ slug, userId }: { slug: string, userId
                         )}
                         
                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent text-xs p-3 truncate transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 z-10">
-                          {selectedFiles[index]?.name || `File ${index + 1}`}
+                          <div className="font-medium">{selectedFiles[index]?.name || `File ${index + 1}`}</div>
+                          <div className="text-xs opacity-75">{formatFileSize(selectedFiles[index]?.size || 0)}</div>
                         </div>
                       </motion.div>
                     ))}
