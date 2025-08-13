@@ -124,7 +124,7 @@ const WeddingForm: React.FC = () => {
           const result = await uploadCoverImage(formDataToUpload);
           
           if (result.success) {
-            setUploadStatus('Cover image uploaded successfully!');
+            setUploadStatus('Slika naslovnice uspješno učitana!');
             coverImageUrl = result.url || '';
             
             const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -132,7 +132,7 @@ const WeddingForm: React.FC = () => {
               fileInput.value = '';
             }
           } else {
-            setUploadStatus('Failed to upload cover image. Please try again.');
+            setUploadStatus('Neuspješno učitavanje slike naslovnice. Pokušajte ponovo.');
             return;
           }
         }
@@ -154,7 +154,7 @@ const WeddingForm: React.FC = () => {
         setEmail(formData.email);
       } catch (error) {
         console.error('Upload error:', error);
-        setUploadStatus('Upload failed. Please try again.');
+        setUploadStatus('Učitavanje neuspješno. Pokušajte ponovo.');
       } finally {
         setUploading(false);
       }
@@ -165,119 +165,140 @@ const WeddingForm: React.FC = () => {
   if (!isClientReady || !isLoaded || !isSignedIn) {
     return (
       <div className="flex flex-col items-center justify-center p-8">
-        <div className="w-16 h-16 border-t-4 border-b-4 border-pink-500 rounded-full animate-spin mb-4"></div>
+        <div className="w-16 h-16 border-4 border-t-4 border-t-transparent border-gold-300 rounded-full animate-spin mb-4"></div>
+        <p className="text-gray-600 font-medium animate-pulse italic">Učitavanje...</p>
       </div>
     );
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-    <div>
-      <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-white">
-        Ime mlade 
-      </label>
-      <input
-        type="text"
-        name="bride"
-        value={formData.bride || ''}
-        onChange={handleInputChange}
-        className="block w-full p-3 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-lg focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-pink-500 dark:focus:border-pink-500"
-        required
-      />
-    </div>
+      <div>
+        <label className="block mb-3 text-lg font-medium text-gray-700 tracking-wide">
+          Ime mlade
+        </label>
+        <input
+          type="text"
+          name="bride"
+          value={formData.bride || ''}
+          onChange={handleInputChange}
+          className="block w-full p-4 text-gray-900 border border-gold-200 rounded-xl bg-white text-lg focus:ring-2 focus:ring-gold-300 focus:border-gold-400 transition-all duration-200 shadow-sm hover:shadow-md"
+          placeholder="Unesite ime mlade"
+          required
+        />
+      </div>
 
-    <div>
-      <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-white">
-        Ime mladeženje
-      </label>
-      <input
-        type="text"
-        name="groom"
-        value={formData.groom || ''}
-        onChange={handleInputChange}
-        className="block w-full p-3 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-lg focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-pink-500 dark:focus:border-pink-500"
-        required
-      />
-    </div>
+      <div>
+        <label className="block mb-3 text-lg font-medium text-gray-700 tracking-wide">
+          Ime mladoženje
+        </label>
+        <input
+          type="text"
+          name="groom"
+          value={formData.groom || ''}
+          onChange={handleInputChange}
+          className="block w-full p-4 text-gray-900 border border-gold-200 rounded-xl bg-white text-lg focus:ring-2 focus:ring-gold-300 focus:border-gold-400 transition-all duration-200 shadow-sm hover:shadow-md"
+          placeholder="Unesite ime mladoženje"
+          required
+        />
+      </div>
 
-    <div>
-      <label className="block mb-2 text-lg font-medium text-gray-900 dark:text-white">
-        Datum vjenčanja
-      </label>
-      <input
-        type="date"
-        name="weddingDate"
-        value={formData.weddingDate || ''}
-        onChange={handleInputChange}
-        className="block w-full p-3 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-lg focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-pink-500 dark:focus:border-pink-500 modern-datepicker"
-        required
-      />
-    </div>
+      <div>
+        <label className="block mb-3 text-lg font-medium text-gray-700 tracking-wide">
+          Datum vjenčanja
+        </label>
+        <input
+          type="date"
+          name="weddingDate"
+          value={formData.weddingDate || ''}
+          onChange={handleInputChange}
+          className="block w-full p-4 text-gray-900 border border-gold-200 rounded-xl bg-white text-lg focus:ring-2 focus:ring-gold-300 focus:border-gold-400 transition-all duration-200 shadow-sm hover:shadow-md"
+          required
+        />
+      </div>
 
-    <div>
-      <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-white">
-        Slika naslovnice
-      </label>
-      {isClientReady && (formData.coverImageUrl || formData.coverImage) && (
-        <div className="mb-4">
-          <div className="relative w-full h-200 overflow-hidden rounded-lg">
-            <img 
-              src={formData.coverImage ? URL.createObjectURL(formData.coverImage) : (formData.coverImageUrl || '/placeholder-image.jpg')} 
-              alt="Cover preview" 
-              className="object-cover w-full h-full"
-            />
+      <div>
+        <label className="block mb-3 text-lg font-medium text-gray-700 tracking-wide">
+          Slika naslovnice
+        </label>
+        {isClientReady && (formData.coverImageUrl || formData.coverImage) && (
+          <div className="mb-4">
+            <div className="relative w-full h-120 overflow-hidden rounded-xl border-2 border-gold-200 shadow-md">
+              <img 
+                src={formData.coverImage ? URL.createObjectURL(formData.coverImage) : (formData.coverImageUrl || '/placeholder-image.jpg')} 
+                alt="Pregled naslovnice" 
+                className="object-cover w-full h-full"
+              />
+              <div className="absolute inset-0 border border-gold-300 rounded-xl m-1 pointer-events-none opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+            </div>
           </div>
+        )}
+        <input
+          type="file"
+          name="coverImage"
+          accept="image/*"
+          onChange={handleInputChange}
+          className="block w-full p-4 text-gray-900 border border-gold-200 rounded-xl bg-white text-lg focus:ring-2 focus:ring-gold-300 focus:border-gold-400 transition-all duration-200 shadow-sm hover:shadow-md file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gold-50 file:text-gold-700 hover:file:bg-gold-100"
+        />
+      </div>
+
+      <div>
+        <label className="block mb-3 text-lg font-medium text-gray-700 tracking-wide">
+          Email adresa
+        </label>
+        <input
+          type="email"
+          name="email"
+          value={formData.email || ''}
+          onChange={handleInputChange}
+          className="block w-full p-4 text-gray-600 border border-gold-200 rounded-xl bg-gray-50 text-lg cursor-not-allowed"
+          required
+          readOnly
+          disabled
+        />
+      </div>
+
+      <div>
+        <label className="block mb-3 text-lg font-medium text-gray-700 tracking-wide">
+          URL Slug
+        </label>
+        <input
+          type="text"
+          name="slug"
+          value={formData.slug || ''}
+          disabled={true}
+          onChange={handleInputChange}
+          className="block w-full p-4 text-gray-600 border border-gold-200 rounded-xl bg-gray-50 text-lg cursor-not-allowed"
+          required
+        />
+        <p className="mt-2 text-sm text-gray-500 italic">Ovo će biti automatski generisano iz vaših imena i datuma vjenčanja</p>
+      </div>
+
+      <button
+        type="submit"
+        disabled={uploading}
+        className="mt-6 w-full bg-gradient-to-r from-gold-400 to-gold-500 text-white py-4 px-6 rounded-xl hover:from-gold-500 hover:to-gold-600 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium tracking-wide"
+      >
+        {uploading ? (
+          <div className="flex items-center justify-center">
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
+            <span>Spremanje...</span>
+          </div>
+        ) : (
+          'Spremi podatke o vjenčanju'
+        )}
+      </button>
+      
+      {uploadStatus && (
+        <div className={`mt-4 p-4 rounded-xl text-center text-sm font-medium ${
+          uploadStatus.includes('uspješno') 
+            ? 'bg-green-50 text-green-700 border border-green-200' 
+            : 'bg-red-50 text-red-700 border border-red-200'
+        }`}>
+          {uploadStatus}
         </div>
       )}
-      <input
-        type="file"
-        name="coverImage"
-        accept="image/*"
-        onChange={handleInputChange}
-        className="block w-full p-3 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-lg focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-pink-500 dark:focus:border-pink-500"
-      />
-    </div>
-
-    <div>
-      <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-white">
-        Email
-      </label>
-      <input
-        type="email"
-        name="email"
-        value={formData.email || ''}
-        onChange={handleInputChange}
-        className="block w-full p-3 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-lg focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-pink-500 dark:focus:border-pink-500"
-        required
-        readOnly
-        disabled
-      />
-    </div>
-
-    <div>
-      <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-white">
-        URL Slug
-      </label>
-      <input
-        type="text"
-        name="slug"
-        value={formData.slug || ''}
-        disabled={true}
-        onChange={handleInputChange}
-        className="block w-full p-3 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-lg focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-pink-500 dark:focus:border-pink-500"
-        required
-      />
-    </div>
-
-    <button
-      type="submit"
-      disabled={uploading}
-      className="mt-4 w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-4 rounded-lg hover:from-purple-700 hover:to-pink-700 disabled:bg-gray-300"
-    >
-      {uploading ? 'Uploading...' : 'Save Details'}
-    </button>
-    <p className="mt-2 text-center text-sm text-gray-500">{uploadStatus}</p>
-  </form>
+    </form>
   );
 };
 
