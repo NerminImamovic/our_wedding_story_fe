@@ -59,8 +59,8 @@ const QRCodeGenerator: React.FC = () => {
       </div>
       
       <button
-        className={`w-full bg-gradient-to-r from-gold-400 to-gold-500 text-white py-4 px-6 rounded-xl hover:from-gold-500 hover:to-gold-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium tracking-wide ${
-          !slug ? 'from-gray-300 to-gray-400 cursor-not-allowed hover:from-gray-300 hover:to-gray-400 transform-none' : ''
+        className={`w-full bg-gradient-to-r from-gray-400 to-gray-500 text-white py-4 px-6 rounded-xl hover:from-gray-500 hover:to-gray-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium tracking-wide ${
+          !slug ? 'cursor-not-allowed transform-none' : ''
         }`}
         onClick={(e) => {
           if (!slug) {
@@ -99,7 +99,7 @@ const QRCodeGenerator: React.FC = () => {
             className={`w-full py-4 px-6 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg font-medium tracking-wide ${
               !slug 
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                : 'bg-gold-50 text-gold-700 hover:bg-gold-100 border-2 border-gold-200 hover:border-gold-300'
+                : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border-2 border-gray-200 hover:border-gray-300'
             }`}
           >
             <div className="flex items-center justify-center">

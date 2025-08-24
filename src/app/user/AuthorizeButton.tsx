@@ -18,8 +18,8 @@ const AuthorizeButton: React.FC = () => {
       
       <a
         href={`${BASE_URL}/auth?email=${email}`}
-        className={`w-full bg-gradient-to-r from-gold-400 to-gold-500 text-white py-4 px-6 rounded-xl hover:from-gold-500 hover:to-gold-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium tracking-wide flex items-center justify-center ${
-          disabled ? 'from-gray-300 to-gray-400 cursor-not-allowed hover:from-gray-300 hover:to-gray-400 transform-none' : ''
+        className={`w-full bg-gradient-to-r from-gray-400 to-gray-500 text-white py-4 px-6 rounded-xl hover:from-gray-500 hover:to-gray-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium tracking-wide flex items-center justify-center ${
+          disabled ? 'cursor-not-allowed transform-none' : ''
         }`}
         onClick={(e) => {
           if (disabled) {

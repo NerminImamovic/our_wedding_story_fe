@@ -277,7 +277,7 @@ const WeddingForm: React.FC = () => {
       <button
         type="submit"
         disabled={uploading}
-        className="mt-6 w-full bg-gradient-to-r from-gold-400 to-gold-500 text-white py-4 px-6 rounded-xl hover:from-gold-500 hover:to-gold-600 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium tracking-wide"
+        className="mt-6 w-full bg-gradient-to-r from-gray-400 to-gray-500 text-white py-4 px-6 rounded-xl hover:from-gray-500 hover:to-gray-600 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium tracking-wide"
       >
         {uploading ? (
           <div className="flex items-center justify-center">

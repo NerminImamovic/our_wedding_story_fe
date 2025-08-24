@@ -521,8 +521,8 @@ export default function UploadComponent({ slug, userId }: { slug: string, userId
                     className={`w-full py-3 px-4 rounded-xl 
                       transition-all duration-300 shadow-sm font-medium tracking-wide
                       ${uploadComplete 
-                        ? 'bg-gradient-to-r from-gold-200 to-gold-100 text-gold-800 border border-gold-200' 
-                        : 'bg-gradient-to-r from-gold-400 to-gold-300 border border-gold-300 hover:from-gold-500 hover:to-gold-400'
+                        ? 'bg-gradient-to-r from-gray-200 to-gray-100 text-gray-800 border border-gray-200' 
+                        : 'bg-gradient-to-r from-gray-400 to-gray-300 border border-gray-300 hover:from-gray-500 hover:to-gray-400'
                       }
                       disabled:opacity-70 disabled:cursor-not-allowed`}
                   >
