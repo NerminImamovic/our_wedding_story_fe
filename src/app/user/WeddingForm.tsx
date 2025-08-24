@@ -23,6 +23,7 @@ const WeddingForm: React.FC = () => {
     email: '',
     coverImage: null as File | null,
     coverImageUrl: '',
+    welcomeMessage: '',
   });
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string>('');
@@ -64,6 +65,7 @@ const WeddingForm: React.FC = () => {
         email: email,
         coverImage: null,
         coverImageUrl: details.coverImageUrl,
+        welcomeMessage: details.welcomeMessage,
       });
 
       setSlug(details.slug);
@@ -148,6 +150,7 @@ const WeddingForm: React.FC = () => {
           slug: formData.slug,
           coverImageUrl,
           email: formData.email,
+          welcomeMessage: formData.welcomeMessage,
         });
 
         setSlug(formData.slug);
@@ -159,7 +162,7 @@ const WeddingForm: React.FC = () => {
         setUploading(false);
       }
     },
-    [userId, formData.coverImage, formData.bride, formData.groom, formData.weddingDate, formData.slug, formData.coverImageUrl, formData.email, mutation, setSlug, setEmail]
+    [userId, formData.coverImage, formData.bride, formData.groom, formData.weddingDate, formData.slug, formData.coverImageUrl, formData.email, formData.welcomeMessage, mutation, setSlug, setEmail]
   );
 
   if (!isClientReady || !isLoaded || !isSignedIn) {
@@ -239,6 +242,21 @@ const WeddingForm: React.FC = () => {
           accept="image/*"
           onChange={handleInputChange}
           className="block w-full p-4 text-gray-900 border border-gold-200 rounded-xl bg-white text-lg focus:ring-2 focus:ring-gold-300 focus:border-gold-400 transition-all duration-200 shadow-sm hover:shadow-md file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-gold-50 file:text-gold-700 hover:file:bg-gold-100"
+        />
+      </div>
+
+      <div>
+        <label className="block mb-3 text-lg font-medium text-gray-700 tracking-wide">
+          Poruka dobrodoslice
+        </label>
+        <input
+          type="text"
+          name="welcomeMessage"
+          value={formData.welcomeMessage || ''}
+          onChange={handleInputChange}
+          className="block w-full p-4 text-gray-900 border border-gold-200 rounded-xl bg-white text-lg focus:ring-2 focus:ring-gold-300 focus:border-gold-400 transition-all duration-200 shadow-sm hover:shadow-md"
+          placeholder="Unesite poruku dobrodoslice"
+          required
         />
       </div>
 

@@ -703,7 +703,7 @@ export default function UploadComponent({ slug, userId }: { slug: string, userId
             </svg>
             <div className="h-px bg-gradient-to-r from-white via-gold-200 to-white flex-grow max-w-xs"></div>
           </div>
-          <p className="text-gray-500 text-sm italic">Share your cherished moments from this special day</p>
+          <p className="text-gray-500 text-sm italic">{data?.welcomeMessage || ''}</p>
         </motion.div>
       </motion.div>
     </div>
