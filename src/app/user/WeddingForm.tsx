@@ -247,7 +247,7 @@ const WeddingForm: React.FC = () => {
 
       <div>
         <label className="block mb-3 text-lg font-medium text-gray-700 tracking-wide">
-          Poruka dobrodoslice
+          Poruka dobrodošlice
         </label>
         <input
           type="text"
@@ -255,7 +255,7 @@ const WeddingForm: React.FC = () => {
           value={formData.welcomeMessage || ''}
           onChange={handleInputChange}
           className="block w-full p-4 text-gray-900 border border-gold-200 rounded-xl bg-white text-lg focus:ring-2 focus:ring-gold-300 focus:border-gold-400 transition-all duration-200 shadow-sm hover:shadow-md"
-          placeholder="Unesite poruku dobrodoslice"
+          placeholder="Unesite poruku dobrodošlice"
           required
         />
       </div>
