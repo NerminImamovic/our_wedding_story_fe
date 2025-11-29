@@ -51,7 +51,10 @@ const WeddingForm: React.FC = () => {
 
   const { data: details, error } = useQuery({
     queryKey: ['weddingDetails', { email: formData.email }],
-    queryFn: () => getMyWeddingDetails({ email: formData.email }),
+    queryFn: async () => {
+      const token = await getToken();
+      return getMyWeddingDetails({ email: formData.email }, token || undefined);
+    },
     enabled: !!formData.email && isClientReady, // Only run query when email is available and client is ready
   });
 

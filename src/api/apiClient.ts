@@ -39,10 +39,15 @@ export const createWeddingDetails = async (bodyParams: Record<string, any> = {},
   return executeApiCall(url, options);
 }
 
-export const getMyWeddingDetails = async (queryParams: Record<string, string> = {}): Promise<any> => {
+export const getMyWeddingDetails = async (queryParams: Record<string, string> = {}, bearerToken?: string): Promise<any> => {
   const url = BASE_URL + '/my-wedding-details';
   const queryString = new URLSearchParams(queryParams).toString();
-  return executeApiCall(`${url}?${queryString}`);
+  const options: RequestInit = bearerToken ? {
+    headers: {
+      'Authorization': `Bearer ${bearerToken}`,
+    },
+  } : {};
+  return executeApiCall(`${url}?${queryString}`, options);
 }
 
 export const getUserImages = async ({ slug, userId }: { slug: string, userId: string }): Promise<any> => {
