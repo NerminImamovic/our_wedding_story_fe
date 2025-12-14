@@ -5,26 +5,22 @@ import WeddingForm from './WeddingForm'
 import QRCodeGenerator from './QRCodeGenerator'
 import AuthorizeButton from './AuthorizeButton'
 import { UserProvider } from './UserContext'
-import { UserButton } from '@clerk/nextjs'
+import AuthenticatedLayout from '@/components/AuthenticatedLayout'
 
 export default function UserPage() {
   return (
     <UserProvider>
-      <div className="min-h-screen bg-white font-serif relative overflow-hidden">
-        {/* Decorative elements matching [slug] page */}
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold-300 to-transparent opacity-50"></div>
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold-300 to-transparent opacity-50"></div>
-        <div className="absolute top-20 right-10 w-40 h-40 border border-gold-200 rounded-full opacity-10"></div>
-        <div className="absolute bottom-20 left-10 w-60 h-60 border border-gold-200 rounded-full opacity-10"></div>
-        <div className="absolute top-1/3 left-1/4 w-32 h-32 border border-gold-200 rounded-full opacity-10"></div>
-        
-        {/* User button positioned absolutely */}
-        <div className="absolute top-4 right-4 z-10">
-          <UserButton />
-        </div>
-        
-        {/* Main content container */}
-        <div className="max-w-7xl mx-auto px-4 py-8 pt-20">
+      <AuthenticatedLayout>
+        <div className="bg-white font-serif relative overflow-hidden rounded-xl shadow-lg">
+          {/* Decorative elements matching [slug] page */}
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold-300 to-transparent opacity-50"></div>
+          <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold-300 to-transparent opacity-50"></div>
+          <div className="absolute top-20 right-10 w-40 h-40 border border-gold-200 rounded-full opacity-10"></div>
+          <div className="absolute bottom-20 left-10 w-60 h-60 border border-gold-200 rounded-full opacity-10"></div>
+          <div className="absolute top-1/3 left-1/4 w-32 h-32 border border-gold-200 rounded-full opacity-10"></div>
+          
+          {/* Main content container */}
+          <div className="max-w-7xl mx-auto px-4 py-8">
           {/* Page header */}
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-4 w-full mb-6">
@@ -108,8 +104,9 @@ export default function UserPage() {
             </div>
             <p className="text-gray-500 text-sm italic">Kreirajte svoje savršeno iskustvo vjenčanja</p>
           </div>
+          </div>
         </div>
-      </div>
+      </AuthenticatedLayout>
     </UserProvider>
   )
 } 

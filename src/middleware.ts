@@ -1,21 +1,22 @@
- 
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
 
-const isUserRoute = createRouteMatcher(['/user'])
+const isProtectedRoute = createRouteMatcher(['/user', '/galerija'])
 
 const isDefaultRoute = createRouteMatcher(['/'])
 
 export default clerkMiddleware(async (auth, req: NextRequest) => {
   const { userId, redirectToSignIn } = await auth()
 
-  // For users visiting /onboarding, don't try to redirect
+  // Redirect logged-in users from home to user page
   if (userId && isDefaultRoute(req)) {
     return NextResponse.redirect(new URL('/user', req.url))
   }
 
-  // If the user is logged in and the route is protected, let them view.
-  if (!userId && isUserRoute(req)) return redirectToSignIn();
+  // Protect authenticated routes
+  if (!userId && isProtectedRoute(req)) {
+    return redirectToSignIn()
+  }
 })
 
 export const config = {

@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // const BASE_URL = 'https://w4dw49ovhe.execute-api.us-east-1.amazonaws.com/dev';
 export const BASE_URL = 'https://api.our-wedding-story.com'
+// export const BASE_URL = 'http://localhost:3001'
 
 export const executeApiCall = async (endpoint: string, options: RequestInit = {}): Promise<any> => {
   try {
     const response = await fetch(`${endpoint}`, options);
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      // throw new Error(`HTTP error! status: ${response.status}`);
+      console.error('HTTP error! status: ${response.status}');
+      return;
     }
 
   if (!response) {
@@ -126,5 +129,23 @@ export const getPresignedUploadUrl = async ({
     }),
   };
   
+  return executeApiCall(url, options);
+}
+
+export const getAllImages = async (
+  bearerToken: string,
+  page: number = 1,
+  limit: number = 20
+): Promise<any> => {
+  const queryParams = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+  const url = `${BASE_URL}/all-images?${queryParams}`;
+  const options: RequestInit = {
+    headers: {
+      'Authorization': `Bearer ${bearerToken}`,
+    },
+  };
   return executeApiCall(url, options);
 }
