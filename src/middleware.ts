@@ -1,7 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
 
-const isProtectedRoute = createRouteMatcher(['/user', '/galerija'])
+const isProtectedRoute = createRouteMatcher(['/user', '/gallery'])
 
 const isDefaultRoute = createRouteMatcher(['/'])
 

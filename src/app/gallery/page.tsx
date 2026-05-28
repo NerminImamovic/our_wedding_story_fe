@@ -26,7 +26,7 @@ interface PaginationData {
   hasPrevPage: boolean
 }
 
-export default function GalerijaPage() {
+export default function GalleryPage() {
   const [selectedImage, setSelectedImage] = useState<ImageItem | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [limit] = useState(20)
@@ -148,7 +148,7 @@ export default function GalerijaPage() {
       const url = window.URL.createObjectURL(zipBlob)
       const link = document.createElement('a')
       link.href = url
-      link.download = `galerija_sve_slike_${new Date().getTime()}.zip`
+      link.download = `gallery_all_images_${new Date().getTime()}.zip`
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)

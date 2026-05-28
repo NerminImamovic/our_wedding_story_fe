@@ -1,14 +1,13 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { UserButton } from '@clerk/nextjs'
 
 const navigation = [
   { name: 'Postavke', href: '/user' },
-  { name: 'Galerija', href: '/galerija' },
+  { name: 'Galerija', href: '/gallery' },
 ]
 
 export default function Sidebar() {
@@ -118,15 +117,6 @@ export default function Sidebar() {
         {/* Logo/Brand Section */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center gap-3">
-            <div className="relative w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-purple-400 to-pink-400">
-              <Image
-                src="https://images.unsplash.com/photo-1519741497674-611481863552?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80"
-                alt="Wedding logo"
-                width={48}
-                height={48}
-                className="object-cover"
-              />
-            </div>
             <div>
               <h2 className="text-lg font-bold text-gray-800">
                 Vaše Vjenčanje

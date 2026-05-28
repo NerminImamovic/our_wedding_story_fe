@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // const BASE_URL = 'https://w4dw49ovhe.execute-api.us-east-1.amazonaws.com/dev';
-export const BASE_URL = 'https://api.our-wedding-story.com'
+// export const BASE_URL = 'https://api.our-wedding-story.com'
+// export const BASE_URL = 'https://g6518yu33i.execute-api.us-east-1.amazonaws.com'
+export const BASE_URL = 'https://a8n60ygohd.execute-api.us-east-1.amazonaws.com'
 // export const BASE_URL = 'http://localhost:3001'
 
 export const executeApiCall = async (endpoint: string, options: RequestInit = {}): Promise<any> => {
